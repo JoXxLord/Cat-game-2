@@ -41,6 +41,13 @@ function preload() {
   gameMusic = loadSound('NAS.mp3'); 
 }
 
+function setup() {
+  createCanvas(windowWidth, windowHeight);
+  catY = height - 150; // Ajusta la posición inicial del gato
+  resetGame();
+  backgroundMusic.loop(); // Reproducir música en bucle
+}
+
 function draw() {
   background(backgroundImage);
 
