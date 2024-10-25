@@ -446,12 +446,19 @@ function showlore(){
 function setup() {
   createCanvas(windowWidth, windowHeight);
   // Boton para iniciar el juego
-  button = createButton("Empezar Juego!");
+  button = createButton("Empezar Juego");
   button.mouseClicked(startGame);
+<<<<<<< HEAD
   button.size(100,70);
   button.position(500,170);
   button.style("font-family", "Bodoni");
   button.style("font-size", "26px");
+=======
+  button.size(100,60);
+  button.position(580,200);
+  button.style("font-family", "Bodoni");
+  button.style("font-size", "20px");
+>>>>>>> 1168dfce39e20152a38f778a2d34145bca3c524c
   catY = height - 150; // Ajusta la posición inicial del gato
   resetGame();
   backgroundMusic.loop(); // Reproducir música en bucle
@@ -864,3 +871,76 @@ function shootProjectile(targetX, targetY) {
   projectilesSize.push(10); 
 }
 
+<<<<<<< HEAD
+=======
+function touchStarted() {
+  if (gameState === 'start') {
+    resetGame(); // Reinicia el juego completo
+    gameState = 'prepare';
+    preparationCountdown = preparationTime;
+    backgroundMusic.stop();
+    gameMusic.loop(); // Inicia la música del juego
+  } else if (gameState === 'play') {
+    if (touchX < width / 2) {
+      // Lado izquierdo para saltar
+      if (!catJumping) {
+        catJumping = true;
+        catVelocityY = -jumpStrength;
+      }
+    } else {
+      // Lado derecho para disparar
+      shootProjectile(touchX, touchY);
+    }
+  }
+}
+
+function draw() {
+  background(backgroundImage);
+
+  if (gameState === 'start') {
+    displayStartMenu();
+  } else if (gameState === 'rules') {
+    displayRulesMenu();
+  } else if (gameState === 'lore') {
+    displayLoreMenu();
+  } else if (gameState === 'prepare') {
+    displayPreparationCountdown();
+  } else if (gameState === 'play') {
+    playGame();
+    if (isMobile()) displayMobileControls(); // Mostrar controles móviles si es necesario
+  } else if (gameState === 'win') {
+    displayWinMenu();
+  } else if (gameState === 'lose') {
+    displayLoseMenu();
+  }
+}
+
+function isMobile() {
+  return /Android|iPhone|iPad|iPod/i.test(navigator.userAgent);
+}
+
+// Mostrar botones en dispositivos móviles
+function displayMobileControls() {
+  fill(255);
+  textSize(20);
+  textAlign(CENTER);
+  text("SALTA", width * 0.15, height * 0.9);
+  text("DISPARA", width * 0.85, height * 0.9);
+}
+
+// Detección de toques para dispositivos móviles
+function touchStarted() {
+  if (gameState === 'play') {
+    if (touchX < width / 2) {
+      // Lado izquierdo para saltar
+      if (!catJumping) {
+        catJumping = true;
+        catVelocityY = -jumpStrength;
+      }
+    } else {
+      // Lado derecho para disparar
+      shootProjectile(touchX, touchY);
+    }
+  }
+}
+>>>>>>> 1168dfce39e20152a38f778a2d34145bca3c524c
