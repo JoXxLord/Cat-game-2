@@ -292,8 +292,6 @@ function playGame() {
       }
     }
   }
-
-  // Muestra la puntuación
   fill(0);
   textSize(24);
   text("Puntuación: " + score, width - 150, 50);
@@ -694,7 +692,7 @@ function manageProjectiles() {
       }
     } else {
       for (let j = enemiesX.length - 1; j >= 0; j--) {
-        if (dist(projectilesX[i], projectilesY[i], enemiesX[j], enemiesY[j]) < 35) {
+        if (dist(projectilesX[i], projectilesY[i], enemiesX[j], enemiesY[j] + 45) < 35) {
           enemiesX.splice(j, 1);
           enemiesY.splice(j, 1);
           projectilesX.splice(i, 1);
@@ -819,9 +817,11 @@ function keyPressed() {
       }
     }
   }
-  if (key === 'W' && gameState === 'play' && !catJumping) { // Solo permite saltar si no está saltando
-    catJumping = true;
-    catVelocityY = -jumpStrength; // Inicia el salto
+  if (key ==='W' || key==='w'){
+    if (gameState === 'play' && !catJumping) { // Solo permite saltar si no está saltando
+      catJumping = true;
+      catVelocityY = -jumpStrength; // Inicia el salto
+    }
   }
 }
 
