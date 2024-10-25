@@ -445,7 +445,7 @@ function setup() {
   button.size(400,170);
   button.position(150,580);
   button.style("font-family", "Bodoni");
-  button.style("font-size", "48px");
+  button.style("font-size", "36px");
   catY = height - 150; // Ajusta la posición inicial del gato
   resetGame();
   backgroundMusic.loop(); // Reproducir música en bucle
