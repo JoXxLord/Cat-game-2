@@ -437,18 +437,31 @@ function startGame(){
   button.remove()
 }
 
+// funcion para iniciar el juego
+function showlore(){
+  gameState = 'lore'
+  button.remove()
+  buttonlore.remove()
+}
 function setup() {
   createCanvas(windowWidth, windowHeight);
   // Boton para iniciar el juego
   button = createButton("Empezar Juego!");
   button.mouseClicked(startGame);
-  button.size(400,170);
-  button.position(150,580);
+  button.size(400,100);
+  button.position(500,500);
   button.style("font-family", "Bodoni");
-  button.style("font-size", "36px");
+  button.style("font-size", "48px");
   catY = height - 150; // Ajusta la posición inicial del gato
   resetGame();
   backgroundMusic.loop(); // Reproducir música en bucle
+   // Boton para lore
+   buttonlore = createButton("Lore");
+   buttonlore.mouseClicked(showlore);
+   buttonlore.size(200,100);
+   buttonlore.position(500,300);
+   buttonlore.style("font-family", "Bodoni");
+   buttonlore.style("font-size", "48px");
 }
 
 function draw() {
