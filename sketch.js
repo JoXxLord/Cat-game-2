@@ -45,7 +45,7 @@ function setup() {
   createCanvas(windowWidth, windowHeight);
   catY = height - 150; // Ajusta la posición inicial del gato
   resetGame();
-  backgroundMusic.loop(); // Reproducir música en bucle
+  backgroundMusic.loop(); // Reproducir música en bucle
 }
 
 function draw() {
@@ -437,31 +437,18 @@ function startGame(){
   button.remove()
 }
 
-// funcion para iniciar el juego
-function showlore(){
-  gameState = 'lore'
-  button.remove()
-  buttonlore.remove()
-}
 function setup() {
   createCanvas(windowWidth, windowHeight);
   // Boton para iniciar el juego
   button = createButton("Empezar Juego!");
   button.mouseClicked(startGame);
-  button.size(500,500);
-  button.position(500,500);
+  button.size(400,170);
+  button.position(150,580);
   button.style("font-family", "Bodoni");
   button.style("font-size", "48px");
   catY = height - 150; // Ajusta la posición inicial del gato
   resetGame();
   backgroundMusic.loop(); // Reproducir música en bucle
-   // Boton para lore
-   buttonlore = createButton("Lore");
-   buttonlore.mouseClicked(showlore);
-   buttonlore.size(300,300);
-   buttonlore.position(500,500);
-   buttonlore.style("font-family", "Bodoni");
-   buttonlore.style("font-size", "48px");
 }
 
 function draw() {
@@ -817,4 +804,49 @@ function displayHUD() {
   text(`Puntaje: ${score}`, 71, 80);
   text(`Ronda: ${round}`, 60, 110);
   text(`Enemigos Perdidos: ${missedEnemies}`, 144, 140);
+}
+
+function keyPressed() {
+  if (key === 'Enter') {
+    if (gameState === 'start' || gameState === 'win' || gameState === 'lose') {
+      resetGame(); // Reiniciar el juego completo
+      gameState = 'prepare';
+      preparationCountdown = preparationTime;
+
+      backgroundMusic.stop(); // Detener música de fondo
+      gameMusic.loop(); // Reproducir música del juego
+    }
+  }
+  if (key === 'T' && gameState === 'start') {
+    gameState = 'rules';
+  }
+  if (key === 'B' && (gameState === 'rules' || gameState === 'lore')) {
+    gameState = 'start';
+  }
+  if (key === 'L' && gameState === 'start') {
+    gameState = 'lore';
+  }
+  if (key === ' ' && gameState === 'play') {
+    if (canShoot || rapidFire) {
+      shootProjectile(mouseX, mouseY);
+      if (!rapidFire) {
+        canShoot = false;
+        lastShootTime = millis();
+      }
+    }
+  }
+  if (key ==='W' || key==='w'){
+    if (gameState === 'play' && !catJumping) { // Solo permite saltar si no está saltando
+      catJumping = true;
+      catVelocityY = -jumpStrength; // Inicia el salto
+    }
+  }
+}
+
+function shootProjectile(targetX, targetY) {
+  projectilesX.push(100);
+  projectilesY.push(height - 100);
+  projectilesVelX.push((targetX - 100) / 30);
+  projectilesVelY.push((targetY - (height - 100)) / 30);
+  projectilesSize.push(10); 
 }

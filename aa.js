@@ -1,46 +1,44 @@
 let cat, enemiesX = [], enemiesY = [], enemiesDir = [], projectilesX = [], projectilesY = [], projectilesVelX = [], projectilesVelY = [], projectilesSize = [];
 let powerUpsX = [], powerUpsY = [];
 let round = 1, maxRounds = 5, enemyCount = 3;
-let gameState = 'start'; // 'start', 'play', 'win', 'lose', 'prepare', 'rules', 'lore'
-let timer = 20; // 20 segundos por ronda
+let gameState = 'start'; 
+let timer = 20; 
 let score = 0;
-let missedEnemies = 0; // Enemigos no eliminados
+let missedEnemies = 0; 
 let powerUpActive = false;
-let powerUpType = '';
+let powerUpType = 'rapidFire';
 let shootSpeed = 1;
 let timeBonus = 0;
-let canShoot = true; // Controla el cooldown de disparo
-let shootCooldown = 1500; // Cooldown de 1.5 segundos entre disparos
-let lastShootTime = 0; // Tiempo del último disparo
-let powerUpTimer = 0; // Controla la duración del Power-up
+let canShoot = true;
+let shootCooldown = 1500; 
+let lastShootTime = 0;
+let powerUpTimer = 0; 
 let powerUpSpawned = false;
-let rapidFire = false; // Efecto de disparo veloz
+let rapidFire = false; 
 let catJumping = false;
 let catY;
-let catVelocityY = 0; // Velocidad vertical para el salto
-let gravity = 0.5; // Gravedad
-let jumpStrength = 10; // Fuerza del salto
-let preparationTime = 5; // Tiempo entre rondas
-let preparationCountdown = preparationTime; // Variable para la cuenta regresiva
-let customFont; // Variable para almacenar la fuente
+let catVelocityY = 0; 
+let gravity = 0.5; 
+let jumpStrength = 10; 
+let preparationTime = 5; 
+let preparationCountdown = preparationTime; 
+let customFont; 
 let backgroundMusic;
-let gameMusic; // Variable para la música del juego
+let gameMusic; 
 
-// Variables del jefe final
 let bossHealth = 0;
 let bossX = 0;
 let bossY = 0;
 let bossSize = 0;
 
-// Preload assets
 function preload() {
-  customFont = loadFont('Rubik-Black.ttf'); // Carga la fuente
+  customFont = loadFont('Rubik-Black.ttf'); 
   cat = loadImage('Gato.png');
   enemyImage = loadImage('Ratom.png');
   powerUpImage = loadImage('Estambre.png');
   backgroundImage = loadImage('Fondo-1.jpg');
-  backgroundMusic = loadSound('Hol.mp3'); // Cargar música
-  gameMusic = loadSound('NAS.mp3'); // Nueva música del juego
+  backgroundMusic = loadSound('Hol.mp3'); 
+  gameMusic = loadSound('NAS.mp3'); 
 }
 
 function setup() {
@@ -77,12 +75,12 @@ function displayStartMenu() {
   fill(255, 204, 0);
   text("Dientes y Colmillos - CAT GAME", width / 2, height / 2 - 100);
   textSize(24);
+  text("By Joaquín Cortés and Valentina Robles", width / 2, height / 2 + 60);
   fill(0);
   text("Presiona Enter para empezar", width / 2, height / 2);
-  text("Presiona 'T (Mayus)' para leer las reglas", width / 2, height / 2 + 50);
-  text("Presiona 'L (Mayus)' para saber del lore", width / 2, height / 2 + 80);
+  text("Presiona 'T (Mayus)' para leer las reglas", width / 2, height / 2 + 30);
+  text("Presiona 'L (Mayus)' para saber del lore", width / 2, height / 2 + 60);
   textSize(18);
-  text("By Joaquín Cortés and Valentina Robles", width / 2, height / 2 + 100);
 }
 
 function displayLoreMenu() {
@@ -294,8 +292,6 @@ function playGame() {
       }
     }
   }
-
-  // Muestra la puntuación
   fill(0);
   textSize(24);
   text("Puntuación: " + score, width - 150, 50);
@@ -305,13 +301,10 @@ function playGame() {
 
 function activatePowerUp() {
   powerUpActive = true;
-  powerUpType = random(['rapidFire', 'extraTime']); // Elige aleatoriamente el tipo de power-up
   if (powerUpType === 'rapidFire') {
     rapidFire = true; // Habilita disparo rápido
     shootCooldown = 500; // Dispara más rápido
     powerUpTimer = 300; // 5 segundos
-  } else if (powerUpType === 'extraTime') {
-    timer += 10; // Añade 10 segundos al temporizador
   }
 }
 
@@ -414,9 +407,11 @@ function keyPressed() {
       }
     }
   }
-  if (key === 'W' && gameState === 'play' && !catJumping) { // Solo permite saltar si no está saltando
-    catJumping = true;
-    catVelocityY = -jumpStrength; // Inicia el salto
+  if (key ==='W' || key==='w'){
+    if (gameState === 'play' && !catJumping) { // Solo permite saltar si no está saltando
+      catJumping = true;
+      catVelocityY = -jumpStrength; // Inicia el salto
+    }
   }
   if (key === 'E' && gameState === 'play') { // Opción para salir al menú
     gameState = 'start'; // Vuelve al menú principal
@@ -431,8 +426,26 @@ function windowResized() {
 
 }
 
+// funcion para iniciar el juego
+function startGame(){
+  gameState = 'start'
+  resetGame(); // Reiniciar el juego completo
+  gameState = 'prepare';
+  preparationCountdown = preparationTime;
+  backgroundMusic.stop(); // Detener música de fondo
+  gameMusic.loop(); // Reproducir música del juego
+  button.remove()
+}
+
 function setup() {
   createCanvas(windowWidth, windowHeight);
+  // Boton para iniciar el juego
+  button = createButton("Empezar Juego!");
+  button.mouseClicked(startGame);
+  button.size(400,170);
+  button.position(150,580);
+  button.style("font-family", "Bodoni");
+  button.style("font-size", "48px");
   catY = height - 150; // Ajusta la posición inicial del gato
   resetGame();
   backgroundMusic.loop(); // Reproducir música en bucle
@@ -697,7 +710,7 @@ function manageProjectiles() {
       }
     } else {
       for (let j = enemiesX.length - 1; j >= 0; j--) {
-        if (dist(projectilesX[i], projectilesY[i], enemiesX[j], enemiesY[j]) < 35) {
+        if (dist(projectilesX[i], projectilesY[i], enemiesX[j], enemiesY[j] + 45) < 35) {
           enemiesX.splice(j, 1);
           enemiesY.splice(j, 1);
           projectilesX.splice(i, 1);
@@ -754,7 +767,7 @@ function managePowerUps() {
       image(powerUpImage, powerUpsX[i], powerUpsY[i], 40, 40);
       if (catJumping && dist(powerUpsX[i], powerUpsY[i], 50, catY) < 50) {
         powerUpActive = true;
-        powerUpType = 'rapid';
+        powerUpType = random(['rapid','time'])
         powerUpsX.splice(i, 1);
         powerUpsY.splice(i, 1);
       }
@@ -779,6 +792,9 @@ function handlePowerUpEffects() {
     rapidFire = true;
     canShoot = true;
   }
+  else if (powerUpType === 'time') {
+      timer += 10
+    }
 }
 
 function displayHUD() {
@@ -819,9 +835,11 @@ function keyPressed() {
       }
     }
   }
-  if (key === 'W' && gameState === 'play' && !catJumping) { // Solo permite saltar si no está saltando
-    catJumping = true;
-    catVelocityY = -jumpStrength; // Inicia el salto
+  if (key ==='W' || key==='w'){
+    if (gameState === 'play' && !catJumping) { // Solo permite saltar si no está saltando
+      catJumping = true;
+      catVelocityY = -jumpStrength; // Inicia el salto
+    }
   }
 }
 
