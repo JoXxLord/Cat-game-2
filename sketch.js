@@ -832,3 +832,60 @@ function shootProjectile(targetX, targetY) {
   projectilesVelY.push((targetY - (height - 100)) / 30);
   projectilesSize.push(10); 
 }
+
+function setup() {
+  createCanvas(windowWidth, windowHeight);
+  catY = height - 150; // Ajusta la posición inicial del gato
+  resetGame();
+  backgroundMusic.loop(); // Reproducir música en bucle
+}
+
+function draw() {
+  background(backgroundImage);
+
+  if (gameState === 'start') {
+    displayStartMenu();
+  } else if (gameState === 'rules') {
+    displayRulesMenu();
+  } else if (gameState === 'lore') {
+    displayLoreMenu();
+  } else if (gameState === 'prepare') {
+    displayPreparationCountdown();
+  } else if (gameState === 'play') {
+    playGame();
+    if (isMobile()) displayMobileControls(); // Mostrar controles móviles si es necesario
+  } else if (gameState === 'win') {
+    displayWinMenu();
+  } else if (gameState === 'lose') {
+    displayLoseMenu();
+  }
+}
+
+function isMobile() {
+  return /Android|iPhone|iPad|iPod/i.test(navigator.userAgent);
+}
+
+// Mostrar botones en dispositivos móviles
+function displayMobileControls() {
+  fill(255);
+  textSize(20);
+  textAlign(CENTER);
+  text("SALTA", width * 0.15, height * 0.9);
+  text("DISPARA", width * 0.85, height * 0.9);
+}
+
+// Detección de toques para dispositivos móviles
+function touchStarted() {
+  if (gameState === 'play') {
+    if (touchX < width / 2) {
+      // Lado izquierdo para saltar
+      if (!catJumping) {
+        catJumping = true;
+        catVelocityY = -jumpStrength;
+      }
+    } else {
+      // Lado derecho para disparar
+      shootProjectile(touchX, touchY);
+    }
+  }
+}
