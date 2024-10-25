@@ -833,11 +833,25 @@ function shootProjectile(targetX, targetY) {
   projectilesSize.push(10); 
 }
 
-function setup() {
-  createCanvas(windowWidth, windowHeight);
-  catY = height - 150; // Ajusta la posición inicial del gato
-  resetGame();
-  backgroundMusic.loop(); // Reproducir música en bucle
+function touchStarted() {
+  if (gameState === 'start') {
+    resetGame(); // Reinicia el juego completo
+    gameState = 'prepare';
+    preparationCountdown = preparationTime;
+    backgroundMusic.stop();
+    gameMusic.loop(); // Inicia la música del juego
+  } else if (gameState === 'play') {
+    if (touchX < width / 2) {
+      // Lado izquierdo para saltar
+      if (!catJumping) {
+        catJumping = true;
+        catVelocityY = -jumpStrength;
+      }
+    } else {
+      // Lado derecho para disparar
+      shootProjectile(touchX, touchY);
+    }
+  }
 }
 
 function draw() {
