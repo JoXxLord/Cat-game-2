@@ -458,7 +458,7 @@ function setup() {
    // Boton para lore
    buttonlore = createButton("Lore");
    buttonlore.mouseClicked(showlore);
-   buttonlore.size(500,500);
+   buttonlore.size(300,300);
    buttonlore.position(500,500);
    buttonlore.style("font-family", "Bodoni");
    buttonlore.style("font-size", "48px");
