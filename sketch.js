@@ -426,12 +426,42 @@ function windowResized() {
 
 }
 
+// funcion para iniciar el juego
+function startGame(){
+  gameState = 'start'
+  resetGame(); // Reiniciar el juego completo
+  gameState = 'prepare';
+  preparationCountdown = preparationTime;
+  backgroundMusic.stop(); // Detener música de fondo
+  gameMusic.loop(); // Reproducir música del juego
+  button.remove()
+}
+
+// funcion para iniciar el juego
+function showlore(){
+  gameState = 'lore'
+  button.remove()
+  buttonlore.remove()
+}
 function setup() {
   createCanvas(windowWidth, windowHeight);
-
+  // Boton para iniciar el juego
+  button = createButton("Empezar Juego!");
+  button.mouseClicked(startGame);
+  button.size(200,100);
+  button.position(500,500);
+  button.style("font-family", "Bodoni");
+  button.style("font-size", "48px");
   catY = height - 150; // Ajusta la posición inicial del gato
   resetGame();
   backgroundMusic.loop(); // Reproducir música en bucle
+   // Boton para lore
+   buttonlore = createButton("Lore");
+   buttonlore.mouseClicked(showlore);
+   buttonlore.size(200,100);
+   buttonlore.position(500,300);
+   buttonlore.style("font-family", "Bodoni");
+   buttonlore.style("font-size", "48px");
 }
 
 function draw() {
@@ -788,122 +818,3 @@ function displayHUD() {
   text(`Ronda: ${round}`, 60, 110);
   text(`Enemigos Perdidos: ${missedEnemies}`, 144, 140);
 }
-
-function keyPressed() {
-  if (key === 'Enter') {
-    if (gameState === 'start' || gameState === 'win' || gameState === 'lose') {
-      resetGame(); // Reiniciar el juego completo
-      gameState = 'prepare';
-      preparationCountdown = preparationTime;
-
-      backgroundMusic.stop(); // Detener música de fondo
-      gameMusic.loop(); // Reproducir música del juego
-    }
-  }
-  if (key === 'T' && gameState === 'start') {
-    gameState = 'rules';
-  }
-  if (key === 'B' && (gameState === 'rules' || gameState === 'lore')) {
-    gameState = 'start';
-  }
-  if (key === 'L' && gameState === 'start') {
-    gameState = 'lore';
-  }
-  if (key === ' ' && gameState === 'play') {
-    if (canShoot || rapidFire) {
-      shootProjectile(mouseX, mouseY);
-      if (!rapidFire) {
-        canShoot = false;
-        lastShootTime = millis();
-      }
-    }
-  }
-  if (key ==='W' || key==='w'){
-    if (gameState === 'play' && !catJumping) { // Solo permite saltar si no está saltando
-      catJumping = true;
-      catVelocityY = -jumpStrength; // Inicia el salto
-    }
-  }
-}
-
-function shootProjectile(targetX, targetY) {
-  projectilesX.push(100);
-  projectilesY.push(height - 100);
-  projectilesVelX.push((targetX - 100) / 30);
-  projectilesVelY.push((targetY - (height - 100)) / 30);
-  projectilesSize.push(10); 
-}
-
-<<<<<<< HEAD
-=======
-function touchStarted() {
-  if (gameState === 'start') {
-    resetGame(); // Reinicia el juego completo
-    gameState = 'prepare';
-    preparationCountdown = preparationTime;
-    backgroundMusic.stop();
-    gameMusic.loop(); // Inicia la música del juego
-  } else if (gameState === 'play') {
-    if (touchX < width / 2) {
-      // Lado izquierdo para saltar
-      if (!catJumping) {
-        catJumping = true;
-        catVelocityY = -jumpStrength;
-      }
-    } else {
-      // Lado derecho para disparar
-      shootProjectile(touchX, touchY);
-    }
-  }
-}
-
-function draw() {
-  background(backgroundImage);
-
-  if (gameState === 'start') {
-    displayStartMenu();
-  } else if (gameState === 'rules') {
-    displayRulesMenu();
-  } else if (gameState === 'lore') {
-    displayLoreMenu();
-  } else if (gameState === 'prepare') {
-    displayPreparationCountdown();
-  } else if (gameState === 'play') {
-    playGame();
-    if (isMobile()) displayMobileControls(); // Mostrar controles móviles si es necesario
-  } else if (gameState === 'win') {
-    displayWinMenu();
-  } else if (gameState === 'lose') {
-    displayLoseMenu();
-  }
-}
-
-function isMobile() {
-  return /Android|iPhone|iPad|iPod/i.test(navigator.userAgent);
-}
-
-// Mostrar botones en dispositivos móviles
-function displayMobileControls() {
-  fill(255);
-  textSize(20);
-  textAlign(CENTER);
-  text("SALTA", width * 0.15, height * 0.9);
-  text("DISPARA", width * 0.85, height * 0.9);
-}
-
-// Detección de toques para dispositivos móviles
-function touchStarted() {
-  if (gameState === 'play') {
-    if (touchX < width / 2) {
-      // Lado izquierdo para saltar
-      if (!catJumping) {
-        catJumping = true;
-        catVelocityY = -jumpStrength;
-      }
-    } else {
-      // Lado derecho para disparar
-      shootProjectile(touchX, touchY);
-    }
-  }
-}
->>>>>>> 1168dfce39e20152a38f778a2d34145bca3c524c
