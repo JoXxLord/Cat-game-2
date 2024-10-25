@@ -440,12 +440,12 @@ function startGame(){
 function setup() {
   createCanvas(windowWidth, windowHeight);
   // Boton para iniciar el juego
-  button = createButton("Empezar Juego!");
+  button = createButton("Empezar Juego");
   button.mouseClicked(startGame);
-  button.size(240,170);
-  button.position(150,580);
+  button.size(100,60);
+  button.position(580,200);
   button.style("font-family", "Bodoni");
-  button.style("font-size", "36px");
+  button.style("font-size", "20px");
   catY = height - 150; // Ajusta la posición inicial del gato
   resetGame();
   backgroundMusic.loop(); // Reproducir música en bucle
