@@ -426,8 +426,26 @@ function windowResized() {
 
 }
 
+// funcion para iniciar el juego
+function startGame(){
+  gameState = 'start'
+  resetGame(); // Reiniciar el juego completo
+  gameState = 'prepare';
+  preparationCountdown = preparationTime;
+  backgroundMusic.stop(); // Detener música de fondo
+  gameMusic.loop(); // Reproducir música del juego
+  button.remove()
+}
+
 function setup() {
   createCanvas(windowWidth, windowHeight);
+  // Boton para iniciar el juego
+  button = createButton("Empezar Juego!");
+  button.mouseClicked(startGame);
+  button.size(200,100);
+  button.position(500,500);
+  button.style("font-family", "Bodoni");
+  button.style("font-size", "48px");
   catY = height - 150; // Ajusta la posición inicial del gato
   resetGame();
   backgroundMusic.loop(); // Reproducir música en bucle
