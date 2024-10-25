@@ -409,9 +409,11 @@ function keyPressed() {
       }
     }
   }
-  if (key === 'W' && gameState === 'play' && !catJumping) { // Solo permite saltar si no está saltando
-    catJumping = true;
-    catVelocityY = -jumpStrength; // Inicia el salto
+  if (key ==='W' || key==='w'){
+    if (gameState === 'play' && !catJumping) { // Solo permite saltar si no está saltando
+      catJumping = true;
+      catVelocityY = -jumpStrength; // Inicia el salto
+    }
   }
   if (key === 'E' && gameState === 'play') { // Opción para salir al menú
     gameState = 'start'; // Vuelve al menú principal
@@ -749,7 +751,7 @@ function managePowerUps() {
       image(powerUpImage, powerUpsX[i], powerUpsY[i], 40, 40);
       if (catJumping && dist(powerUpsX[i], powerUpsY[i], 50, catY) < 50) {
         powerUpActive = true;
-        powerUpType = 'rapid';
+        powerUpType = random(['rapid','time'])
         powerUpsX.splice(i, 1);
         powerUpsY.splice(i, 1);
       }
@@ -774,6 +776,9 @@ function handlePowerUpEffects() {
     rapidFire = true;
     canShoot = true;
   }
+  else if (powerUpType === 'time') {
+      timer += 10
+    }
 }
 
 function displayHUD() {
