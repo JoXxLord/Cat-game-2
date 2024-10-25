@@ -442,7 +442,7 @@ function setup() {
   // Boton para iniciar el juego
   button = createButton("Empezar Juego!");
   button.mouseClicked(startGame);
-  button.size(400,170);
+  button.size(240,170);
   button.position(150,580);
   button.style("font-family", "Bodoni");
   button.style("font-size", "36px");
