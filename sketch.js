@@ -441,7 +441,7 @@ function setup() {
   // Boton para iniciar el juego
   button = createButton("Empezar Juego!");
   button.mouseClicked(startGame);
-  button.size(200,100);
+  button.size(500,500);
   button.position(500,500);
   button.style("font-family", "Bodoni");
   button.style("font-size", "48px");
@@ -451,8 +451,8 @@ function setup() {
    // Boton para lore
    buttonlore = createButton("Lore");
    buttonlore.mouseClicked(showlore);
-   buttonlore.size(200,100);
-   buttonlore.position(500,300);
+   buttonlore.size(500,500);
+   buttonlore.position(500,500);
    buttonlore.style("font-family", "Bodoni");
    buttonlore.style("font-size", "48px");
 }
