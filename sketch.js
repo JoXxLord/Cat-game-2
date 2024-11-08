@@ -1,8 +1,8 @@
 let cat, enemiesX = [], enemiesY = [], enemiesDir = [], projectilesX = [], projectilesY = [], projectilesVelX = [], projectilesVelY = [], projectilesSize = [];
 let powerUpsX = [], powerUpsY = [];
 let round = 1, maxRounds = 5, enemyCount = 3;
-let active = false; // Controla si se está disparando o no
-let h, k, f, a; // Parámetros de la parábola 
+let active = false; 
+let h, k, f, a; 
 let gameState = 'start'; 
 let timer = 20; 
 let score = 0;
@@ -27,12 +27,10 @@ let preparationCountdown = preparationTime;
 let customFont; 
 let backgroundMusic;
 let gameMusic; 
-
 let bossHealth = 0;
 let bossX = 0;
 let bossY = 0;
 let bossSize = 0;
-
 function preload() {
   customFont = loadFont('Rubik-Black.ttf'); 
   cat = loadImage('Gato.png');
@@ -42,30 +40,12 @@ function preload() {
   backgroundMusic = loadSound('Hol.mp3'); 
   gameMusic = loadSound('NAS.mp3'); 
 }
-
 function setup() {
   createCanvas(windowWidth, windowHeight);
-  catY = height - 150; // Ajusta la posición inicial del gato
+  catY = height - 150; 
   resetGame();
-  backgroundMusic.loop(); // Reproducir música en bucle
+  backgroundMusic.loop(); 
 }
-
-function displayLoreMenu() {
-  textAlign(CENTER);
-  textSize(32);
-  fill(255, 204, 0);
-  text("La historia de Dientes y Colmillos", width / 2, height / 2 - 150);
-  
-  // Aquí puedes añadir tu video
-  textSize(18);
-  fill(0);
-  text("Aquí irá un video (agrega el video más adelante)", width / 2, height / 2);
-  
-  textSize(20);
-  fill(255, 0, 0);
-  text("Presiona 'B (Mayus)' para volver al menú principal", width / 2, height / 2 + 100);
-}
-
 function displayRulesMenu() {
   textAlign(CENTER);
   textSize(32);
@@ -83,74 +63,61 @@ function displayRulesMenu() {
   fill(255, 0, 0);
   text("Presiona 'B (Mayus)' para volver al menú principal", width / 2, height / 2 + 150);
 }
-
 function displayPreparationCountdown() {
   textAlign(CENTER);
   textSize(48);
   fill(255, 204, 0);
-  
   if (round === 1) {
     text("Prepárate para la primera ronda", width / 2, height / 2 - 50);
-  } else if (round === maxRounds + 1) { // Ronda 6 es el jefe final
+  } else if (round === maxRounds + 1) { 
     text("Prepárate para el JEFE: RATMA", width / 2, height / 2 - 50);
   } else {
     text("Prepárate para la siguiente ronda", width / 2, height / 2 - 50);
   }
-
   textSize(36);
   text(preparationCountdown, width / 2, height / 2);
-
   if (frameCount % 60 === 0 && preparationCountdown > 0) {
     preparationCountdown--;
   }
-
   if (preparationCountdown === 0) {
     if (round === maxRounds + 1) {
-      startBossRound(); // Iniciar ronda de jefe
+      startBossRound(); 
     } else {
       resetRound();
       gameState = 'play';
     }
   }
 }
-
-// Función para manejar la ronda del jefe
 function startBossRound() {
-  // Resetea los efectos de power-ups
   rapidFire = false;
-  powerUpActive = false; // Asegúrate de que no haya power-ups activos
-  powerUpType = ''; // Limpia el tipo de power-up
-
-  timer = 40; // Mayor tiempo para la ronda del jefe
-  bossHealth = 30; // 30 proyectiles necesarios para derrotar al jefe
+  powerUpActive = false; 
+  powerUpType = ''; 
+  timer = 40; 
+  bossHealth = 30; 
   bossX = width - 300;
   bossY = height - 400;
-  bossSize = 250; // Tamaño considerable para el jefe
-
-  // Crear enemigos normales detrás del jefe
+  bossSize = 250; 
   for (let i = 0; i < 3; i++) {
-    enemiesX.push(bossX - 100); // Posición fija a la izquierda del jefe
-    enemiesY.push(random(height - 200)); // Posición vertical aleatoria
-    enemiesDir.push(random([-1, 1])); // Dirección aleatoria
+    enemiesX.push(bossX - 100); 
+    enemiesY.push(random(height - 200)); 
+    enemiesDir.push(random([-1, 1])); 
   }
-
   gameState = 'play';
 }
-
 function playGame() {
   if (frameCount % 60 == 0 && timer > 0) timer--;
   if (timer <= 0) {
     if (round === maxRounds + 1) {
       if (bossHealth > 0) {
-        gameState = 'lose'; // Pierde si no elimina al jefe
+        gameState = 'lose'; 
       }
     } else {
       missedEnemies += enemiesX.length; 
       if (missedEnemies >= 3) {
-        gameState = 'lose'; // Pierde si no elimina a los enemigos
+        gameState = 'lose'; 
       } else {
         round++;
-        if (round > maxRounds + 1) { // Incluye ronda de jefe
+        if (round > maxRounds + 1) { 
           gameState = 'win';
         } else {
           gameState = 'prepare';
@@ -159,28 +126,23 @@ function playGame() {
       }
     }
   }
-
   manageCatMovement();
   if (millis() - lastShootTime >= shootCooldown) {
     canShoot = true;
   }
-
-  // Dibuja los enemigos
   for (let i = 0; i < enemiesX.length; i++) {
     if (enemiesX[i] > 0) {
       fill(255, 0, 0);
       image(enemyImage, enemiesX[i], enemiesY[i], 50, 50);
-      enemiesX[i] += enemiesDir[i]; // Mover enemigos
+      enemiesX[i] += enemiesDir[i]; 
     } else {
       missedEnemies++;
-      enemiesX.splice(i, 1); // Elimina el enemigo
+      enemiesX.splice(i, 1); 
       enemiesY.splice(i, 1);
       enemiesDir.splice(i, 1);
-      i--; // Ajusta el índice
+      i--; 
     }
   }
-
-  // Dibuja los proyectiles
   for (let i = 0; i < projectilesX.length; i++) {
     if (projectilesX[i] < width) {
       fill(0, 255, 0);
@@ -188,74 +150,64 @@ function playGame() {
       projectilesX[i] += projectilesVelX[i];
       projectilesY[i] += projectilesVelY[i];
     } else {
-      projectilesX.splice(i, 1); // Elimina el proyectil
+      projectilesX.splice(i, 1); 
       projectilesY.splice(i, 1);
       projectilesVelX.splice(i, 1);
       projectilesVelY.splice(i, 1);
       projectilesSize.splice(i, 1);
-      i--; // Ajusta el índice
+      i--; 
     }
   }
-
-  // Dibuja el power-up
   if (powerUpActive) {
     fill(255, 255, 0);
     image(powerUpImage, powerUpsX[0], powerUpsY[0], 30, 30);
     powerUpTimer--;
     if (powerUpTimer <= 0) {
-      powerUpActive = false; // Desactivar el power-up
+      powerUpActive = false; 
       powerUpsX.splice(0, 1);
       powerUpsY.splice(0, 1);
     }
   } else if (!powerUpSpawned && frameCount % 60 === 0 && timer <= 10) {
-    powerUpsX.push(random(width)); // Posición aleatoria
-    powerUpsY.push(random(height - 100)); // Posición aleatoria
-    powerUpSpawned = true; // Evitar múltiples spawns
-    powerUpTimer = 300; // Dura 5 segundos
+    powerUpsX.push(random(width)); 
+    powerUpsY.push(random(height - 100)); 
+    powerUpSpawned = true; 
+    powerUpTimer = 300; 
   }
-
-  // Dibuja al gato
   fill(0);
   image(cat, mouseX, catY, 100, 100);
-
-  // Verifica colisiones con el power-up
   for (let i = 0; i < powerUpsX.length; i++) {
     if (dist(mouseX, catY, powerUpsX[i], powerUpsY[i]) < 50) {
       activatePowerUp();
       powerUpsX.splice(i, 1);
       powerUpsY.splice(i, 1);
-      break; // Salir del bucle después de recoger un power-up
+      break; 
     }
   }
-
-  // Verifica colisiones entre proyectiles y enemigos
   for (let i = projectilesX.length - 1; i >= 0; i--) {
     for (let j = enemiesX.length - 1; j >= 0; j--) {
       if (dist(projectilesX[i], projectilesY[i], enemiesX[j], enemiesY[j]) < 30) {
-        enemiesX.splice(j, 1); // Elimina enemigo
+        enemiesX.splice(j, 1); 
         enemiesY.splice(j, 1);
         enemiesDir.splice(j, 1);
-        projectilesX.splice(i, 1); // Elimina proyectil
+        projectilesX.splice(i, 1); 
         projectilesY.splice(i, 1);
         projectilesVelX.splice(i, 1);
         projectilesVelY.splice(i, 1);
         projectilesSize.splice(i, 1);
-        score++; // Aumentar puntaje
-        break; // Salir del bucle
+        score++; 
+        break; 
       }
     }
   }
-
-  // Verifica colisiones con el jefe
   if (round === maxRounds + 1) {
     if (bossHealth > 0) {
       fill(255, 0, 0);
       ellipse(bossX, bossY, bossSize);
       if (dist(mouseX, catY, bossX, bossY) < 125) {
-        bossHealth--; // Disminuir salud del jefe
+        bossHealth--; 
       }
       if (bossHealth <= 0) {
-        gameState = 'win'; // Ganar
+        gameState = 'win'; 
       }
     }
   }
@@ -265,97 +217,71 @@ function playGame() {
   text("Ronda: " + round + "/" + maxRounds, width - 150, 80);
   text("Tiempo: " + timer, width - 150, 110);
 }
-
 function activatePowerUp() {
   powerUpActive = true;
   if (powerUpType === 'rapidFire') {
-    rapidFire = true; // Habilita disparo rápido
-    shootCooldown = 500; // Dispara más rápido
-    powerUpTimer = 300; // 5 segundos
+    rapidFire = true; 
+    shootCooldown = 500; 
+    powerUpTimer = 300; 
   }
 }
 function shootProjectile(targetX, targetY) {
   if (!active) {
-    h = mouseX; // Raíz 1, punto de partida del proyectil
-    k = targetX; // Raíz 2, blanco al que se apunta
-    f = (catY + targetY) / 2; // Altura de las raíces (punto medio entre el gato y el objetivo)
-    
-    a = parabolic(catY, targetY, h, k, f); // Calculamos el coeficiente `a`
-
+    h = mouseX; 
+    k = targetX; 
+    f = (catY + targetY) / 2; 
+    a = parabolic(catY, targetY, h, k, f);
     projectilesX.push(h);
     projectilesY.push(catY);
-    projectilesVelX.push(0); // Velocidad inicial X
-    projectilesVelY.push(0); // Velocidad inicial Y
-    projectilesSize.push(10); // Tamaño del proyectil
-    
-    active = true; // Se inicia el disparo
+    projectilesVelX.push(0); 
+    projectilesVelY.push(0); 
+    projectilesSize.push(10); 
+    active = true; 
   }
 }
-
 function parabolic(y, f, h, k) {
-  // Cálculo del coeficiente `a` usando la fórmula proporcionada
   return (y - f) / ((h - k) * (h - k));
 }
-
 function calculate(x) {
-  // Calcula el valor de la función cuadrática en `x`
   return a * (x - h) * (x - k) + f;
 }
-
 function drawRef(targetX, targetY) {
-  // Dibuja el blanco actual
   fill(255, 0, 0);
-  ellipse(targetX, targetY, 20, 20); // Blanco rojo de referencia
+  ellipse(targetX, targetY, 20, 20); 
 }
-
 function updateProjectile() {
-  // Actualiza la posición del proyectil si está en movimiento
   if (active && projectilesX.length > 0) {
     for (let i = 0; i < projectilesX.length; i++) {
-      projectilesX[i] += 1; // Avanza en el eje X
-      projectilesY[i] = calculate(projectilesX[i]); // Calcula la posición Y basada en la parábola
-      
-      // Verifica si el proyectil aún está en pantalla
+      projectilesX[i] += 1; 
+      projectilesY[i] = calculate(projectilesX[i]); 
       if (!onScreen(projectilesX[i], projectilesY[i])) {
-        active = false; // Detiene el disparo si sale de pantalla
+        active = false; 
       }
     }
   }
 }
-
 function onScreen(px, py) {
-  // Verifica que el proyectil esté dentro de la pantalla
   return px >= 0 && px <= width && py >= 0 && py <= height;
 }
-
 function draw() {
   background(220);
-
-  // Dibuja el blanco en el objetivo
   drawRef(mouseX, mouseY);
-
-  // Actualiza y dibuja el proyectil en movimiento
   updateProjectile();
-
-  // Dibuja el proyectil
   fill(0);
   for (let i = 0; i < projectilesX.length; i++) {
     ellipse(projectilesX[i], projectilesY[i], projectilesSize[i], projectilesSize[i]);
   }
 }
-
 function manageCatMovement() {
   if (catJumping) {
     catY += catVelocityY;
-    catVelocityY += gravity; // Aplicar gravedad
-
+    catVelocityY += gravity; 
     if (catY >= height - 150) {
-      catY = height - 150; // Asegúrate de que no se salga de la pantalla
-      catJumping = false; // Termina el salto
+      catY = height - 150; 
+      catJumping = false; 
     }
   }
 }
-
 function resetRound() {
   enemiesX = [];
   enemiesY = [];
@@ -367,19 +293,17 @@ function resetRound() {
   projectilesSize = [];
   powerUpsX = [];
   powerUpsY = [];
-  missedEnemies = 0; // Reinicia los enemigos no eliminados
-  timer = 20; // Reinicia el temporizador
-  powerUpSpawned = false; // Reinicia el spawn del power-up
+  missedEnemies = 0; 
+  timer = 20; 
+  powerUpSpawned = false; 
 }
-
 function resetGame() {
   round = 1;
   score = 0;
   missedEnemies = 0;
   resetRound();
-  gameState = 'start'; // Volver al menú
+  gameState = 'start'; 
 }
-
 function displayWinMenu() {
   textAlign(CENTER);
   textSize(48);
@@ -390,7 +314,6 @@ function displayWinMenu() {
   text("Puntuación final: " + score, width / 2, height / 2);
   text("Presiona Enter para jugar de nuevo", width / 2, height / 2 + 50);
 }
-
 function displayLoseMenu() {
   textAlign(CENTER);
   textSize(48);
@@ -401,16 +324,14 @@ function displayLoseMenu() {
   text("Puntuación final: " + score, width / 2, height / 2);
   text("Presiona Enter para jugar de nuevo", width / 2, height / 2 + 50);
 }
-
 function keyPressed() {
   if (key === 'Enter') {
     if (gameState === 'start' || gameState === 'win' || gameState === 'lose') {
-      resetGame(); // Reiniciar el juego completo
+      resetGame(); 
       gameState = 'prepare';
       preparationCountdown = preparationTime;
-
-      backgroundMusic.stop(); // Detener música de fondo
-      gameMusic.loop(); // Reproducir música del juego
+      backgroundMusic.stop(); 
+      gameMusic.loop(); 
     }
   }
   if (key === 'T' && gameState === 'start') {
@@ -432,57 +353,48 @@ function keyPressed() {
     }
   }
   if (key ==='W' || key==='w'){
-    if (gameState === 'play' && !catJumping) { // Solo permite saltar si no está saltando
+    if (gameState === 'play' && !catJumping) { 
       catJumping = true;
-      catVelocityY = -jumpStrength; // Inicia el salto
+      catVelocityY = -jumpStrength; 
     }
   }
-  if (key === 'E' && gameState === 'play') { // Opción para salir al menú
-    gameState = 'start'; // Vuelve al menú principal
-    resetGame(); // Reinicia el juego
-    backgroundMusic.loop(); // Reinicia la música de fondo
-    gameMusic.stop(); // Detiene la música del juego
+  if (key === 'E' && gameState === 'play') { 
+    gameState = 'start'; 
+    resetGame(); 
+    backgroundMusic.loop(); 
+    gameMusic.stop(); 
   }
 }
-
 function windowResized() {
   resizeCanvas(windowWidth, windowHeight);
-
 }
-
-// funcion para iniciar el juego
 function startGame(){
   gameState = 'start'
-  resetGame(); // Reiniciar el juego completo
+  resetGame();
   gameState = 'prepare';
   preparationCountdown = preparationTime;
-  backgroundMusic.stop(); // Detener música de fondo
-  gameMusic.loop(); // Reproducir música del juego
+  backgroundMusic.stop(); 
+  gameMusic.loop(); 
   button.remove()
 }
-
 function setup() {
   createCanvas(windowWidth, windowHeight);
-  
-  // Botón para iniciar el juego
   button = createButton("Empezar Juego");
   button.mouseClicked(startGame);
   button.size(170, 70);
   button.position(580, 250);
   button.style("font-family", "Rubik-Black");
   button.style("font-size", "18px");
-  button.style("font-weight", "bold"); // Texto en negrita
-  button.style("background-color", "#FFA726"); // Fondo anaranjado amarillento
-  button.style("border-radius", "10px"); // Bordes redondeados
-  button.style("border", "2px solid black"); // Borde negro de 2px
-
-  catY = height - 150; // Ajusta la posición inicial del gato
+  button.style("font-weight", "bold"); 
+  button.style("background-color", "#FFA726"); 
+  button.style("border-radius", "10px"); 
+  button.style("border", "2px solid black"); 
+  catY = height - 150; 
   resetGame();
-  backgroundMusic.loop(); // Reproducir música en bucle
+  backgroundMusic.loop(); 
 }
 function draw() {
   background(backgroundImage);
-
   if (gameState === 'start') {
     displayStartMenu();
   } else if (gameState === 'rules') {
@@ -499,11 +411,10 @@ function draw() {
     displayLoseMenu();
   }
 }
-
 function displayStartMenu() {
   textAlign(CENTER);
   textSize(48);
-  textFont(customFont); // Aplicar la fuente
+  textFont(customFont); 
   fill(255, 204, 0);
   text("Dientes y Colmillos - CAT GAME", width / 2, height / 2 - 100);
   textSize(24);
@@ -513,100 +424,57 @@ function displayStartMenu() {
   textSize(18);
   text("By Joaquín Cortés and Valentina Robles", width / 2, height / 2 + 100);
 }
-
 function displayLoreMenu() {
   textAlign(CENTER);
   textSize(32);
   fill(255, 204, 0);
   text("La historia de Dientes y Colmillos", width / 2, height / 2 - 150);
-  
-  // Aquí puedes añadir tu video
   textSize(18);
   fill(0);
   text("Aquí irá un video (agrega el video más adelante)", width / 2, height / 2);
-  
   textSize(20);
   fill(255, 0, 0);
   text("Presiona 'B (Mayus)' para volver al menú principal", width / 2, height / 2 + 100);
 }
-
-function displayRulesMenu() {
-  textAlign(CENTER);
-  textSize(32);
-  fill(255, 204, 0);
-  text("Reglas del Juego", width / 2, height / 2 - 150);
-  textSize(18);
-  fill(0);
-  text("1. El objetivo es eliminar todos los enemigos en cada ronda.", width / 2, height / 2 - 80);
-  text("2. Los controles son: W (Mayus) para saltar y Espacio para disparar, utiliza el ratón para apuntar.", width / 2, height / 2 - 50);
-  text("3. El juego tiene 6 rondas. A medida que avanzas, más enemigos aparecerán.", width / 2, height / 2 - 20);
-  text("4. Usa la tecla espacio para disparar proyectiles y derrotar a los enemigos.", width / 2, height / 2 + 10);
-  text("5. Al segundo 10 de cada ronda, aparecerá un power-up, salta y golpealo para obtener una mejora.", width / 2, height / 2 + 40);
-  text("6. A partir de la ronda 4, los enemigos se moverán de arriba a abajo.", width / 2, height / 2 + 70);
-  textSize(20);
-  fill(255, 0, 0);
-  text("Presiona 'B (Mayus)' para volver al menú principal", width / 2, height / 2 + 150);
-}
-
 function displayPreparationCountdown() {
   textAlign(CENTER);
   textSize(48);
   fill(255, 204, 0);
-  
   if (round === 1) {
     text("Prepárate para la primera ronda", width / 2, height / 2 - 50);
-  } else if (round === maxRounds + 1) { // Ronda 6 es el jefe final
+  } else if (round === maxRounds + 1) { 
     text("Prepárate para el JEFE: RATMA", width / 2, height / 2 - 50);
   } else {
     text("Prepárate para la siguiente ronda", width / 2, height / 2 - 50);
   }
-
   textSize(36);
   text(preparationCountdown, width / 2, height / 2);
-
   if (frameCount % 60 === 0 && preparationCountdown > 0) {
     preparationCountdown--;
   }
-
   if (preparationCountdown === 0) {
     if (round === maxRounds + 1) {
-      startBossRound(); // Iniciar ronda de jefe
+      startBossRound(); 
     } else {
       resetRound();
       gameState = 'play';
     }
   }
 }
-
-// Función para manejar la ronda del jefe
-function startBossRound() {
-  // Resetea los efectos de power-ups
-  rapidFire = false;
-  powerUpActive = false; // Asegúrate de que no haya power-ups activos
-  powerUpType = ''; // Limpia el tipo de power-up
-
-  timer = 40; // Mayor tiempo para la ronda del jefe
-  bossHealth = 30; // 30 proyectiles necesarios para derrotar al jefe
-  bossX = width - 300;
-  bossY = height - 400;
-  bossSize = 250; // Tamaño considerable para el jefe
-  gameState = 'play';
-}
-
 function playGame() {
   if (frameCount % 60 == 0 && timer > 0) timer--;
   if (timer <= 0) {
     if (round === maxRounds + 1) {
       if (bossHealth > 0) {
-        gameState = 'lose'; // Pierde si no elimina al jefe
+        gameState = 'lose'; 
       }
     } else {
       missedEnemies += enemiesX.length; 
       if (missedEnemies >= 3) {
-        gameState = 'lose'; // Pierde si no elimina a los enemigos
+        gameState = 'lose'; 
       } else {
         round++;
-        if (round > maxRounds + 1) { // Incluye ronda de jefe
+        if (round > maxRounds + 1) { 
           gameState = 'win';
         } else {
           gameState = 'prepare';
@@ -615,20 +483,17 @@ function playGame() {
       }
     }
   }
-
   manageCatMovement();
   if (millis() - lastShootTime >= shootCooldown) {
     canShoot = true;
   }
-
   manageProjectiles();
   manageEnemies();
   managePowerUps();
   displayHUD();
-
   if (enemiesX.length === 0 && gameState === 'play' && round !== maxRounds + 1) {
     round++;
-    if (round > maxRounds + 1) { // Incluye ronda de jefe
+    if (round > maxRounds + 1) { 
       gameState = 'win';
     } else {
       gameState = 'prepare';
@@ -636,7 +501,6 @@ function playGame() {
     }
   }
 }
-
 function displayWinMenu() {
   textAlign(CENTER);
   textSize(48);
@@ -645,7 +509,6 @@ function displayWinMenu() {
   textSize(24);
   text("Presiona Enter para volver a empezar", width / 2, height / 2 + 50);
 }
-
 function displayLoseMenu() {
   textAlign(CENTER);
   textSize(48);
@@ -654,7 +517,6 @@ function displayLoseMenu() {
   textSize(24);
   text("Presiona Enter para volver a empezar", width / 2, height / 2 + 50);
 }
-
 function resetRound() {
   timer = 20 + timeBonus;
   timeBonus = 0;
@@ -671,7 +533,6 @@ function resetRound() {
     enemiesDir.push(random([-1, 1])); 
   }
 }
-
 function resetGame() {
   score = 0;
   missedEnemies = 0;
@@ -691,32 +552,27 @@ function resetGame() {
     enemiesDir.push(random([-1, 1])); 
   }
 }
-
 function manageCatMovement() {
-  // Aplicar gravedad
   if (catJumping) {
     catY += catVelocityY;
-    catVelocityY += gravity; // Aumentar la gravedad
-    if (catY >= height - 150) { // Aterriza
+    catVelocityY += gravity; 
+    if (catY >= height - 150) { 
       catY = height - 150;
       catJumping = false;
-      catVelocityY = 0; // Reiniciar velocidad
+      catVelocityY = 0; 
     }
   }
   image(cat, 50, catY, 150, 150);
 }
-
 function manageProjectiles() {
   for (let i = projectilesX.length - 1; i >= 0; i--) {
     projectilesX[i] += projectilesVelX[i];
     projectilesY[i] += projectilesVelY[i];
     projectilesVelY[i] += 0.25;
-
     let size = 10;
     fill(255, 0, 0);
     ellipse(projectilesX[i], projectilesY[i], size, size);
-
-    if (round === maxRounds + 1) { // Ronda del jefe
+    if (round === maxRounds + 1) { 
       if (dist(projectilesX[i], projectilesY[i], bossX + bossSize / 2, bossY + bossSize / 2) < bossSize / 2) {
         bossHealth--;
         projectilesX.splice(i, 1);
@@ -743,7 +599,6 @@ function manageProjectiles() {
         }
       }
     }
-
     if (projectilesX[i] > width || projectilesY[i] > height || projectilesX[i] < 0 || projectilesY[i] < 0) {
       projectilesX.splice(i, 1);
       projectilesY.splice(i, 1);
@@ -753,15 +608,12 @@ function manageProjectiles() {
     }
   }
 }
-
 function manageEnemies() {
   if (round === maxRounds + 1) {
-    // Jefe final
     fill(255, 0, 0);
-    rect(bossX, bossY - 50, bossHealth * 5, 20); // Barra de vida
+    rect(bossX, bossY - 50, bossHealth * 5, 20); 
     image(enemyImage, bossX, bossY, bossSize, bossSize);
   } else {
-    // Enemigos normales
     for (let i = 0; i < enemiesX.length; i++) {
       if (round >= 4) {
         enemiesY[i] += enemiesDir[i] * 2;
@@ -773,7 +625,6 @@ function manageEnemies() {
     }
   }
 }
-
 function managePowerUps() {
   if (timer === 10 && !powerUpSpawned) {
     powerUpsX.push(50);
@@ -781,7 +632,6 @@ function managePowerUps() {
     powerUpSpawned = true;
     powerUpTimer = 60;
   }
-
   if (powerUpSpawned) {
     for (let i = powerUpsX.length - 1; i >= 0; i--) {
       image(powerUpImage, powerUpsX[i], powerUpsY[i], 40, 40);
@@ -792,7 +642,6 @@ function managePowerUps() {
         powerUpsY.splice(i, 1);
       }
     }
-
     powerUpTimer--;
     if (powerUpTimer <= 0) {
       powerUpSpawned = false;
@@ -800,13 +649,11 @@ function managePowerUps() {
       powerUpsY = [];
     }
   }
-
   if (powerUpActive) {
     handlePowerUpEffects();
     powerUpActive = false; 
   }
 }
-
 function handlePowerUpEffects() {
   if (powerUpType === 'rapid') {
     rapidFire = true;
@@ -816,53 +663,14 @@ function handlePowerUpEffects() {
       timer += 10
     }
 }
-
 function displayHUD() {
   textSize(24);
-  fill(255, 255, 0); // Color amarillo
+  fill(255, 255, 0); 
   text(`Tiempo: ${timer}`, 75, 50);
   text(`Puntaje: ${score}`, 71, 80);
   text(`Ronda: ${round}`, 60, 110);
   text(`Enemigos Perdidos: ${missedEnemies}`, 144, 140);
-}
-
-function keyPressed() {
-  if (key === 'Enter') {
-    if (gameState === 'start' || gameState === 'win' || gameState === 'lose') {
-      resetGame(); // Reiniciar el juego completo
-      gameState = 'prepare';
-      preparationCountdown = preparationTime;
-
-      backgroundMusic.stop(); // Detener música de fondo
-      gameMusic.loop(); // Reproducir música del juego
-    }
-  }
-  if (key === 'T' && gameState === 'start') {
-    gameState = 'rules';
-  }
-  if (key === 'B' && (gameState === 'rules' || gameState === 'lore')) {
-    gameState = 'start';
-  }
-  if (key === 'L' && gameState === 'start') {
-    gameState = 'lore';
-  }
-  if (key === ' ' && gameState === 'play') {
-    if (canShoot || rapidFire) {
-      shootProjectile(mouseX, mouseY);
-      if (!rapidFire) {
-        canShoot = false;
-        lastShootTime = millis();
-      }
-    }
-  }
-  if (key ==='W' || key==='w'){
-    if (gameState === 'play' && !catJumping) { // Solo permite saltar si no está saltando
-      catJumping = true;
-      catVelocityY = -jumpStrength; // Inicia el salto
-    }
-  }
-}
-
+}  
 function shootProjectile(targetX, targetY) {
   projectilesX.push(100);
   projectilesY.push(height - 100);
