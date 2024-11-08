@@ -1,6 +1,8 @@
 let cat, enemiesX = [], enemiesY = [], enemiesDir = [], projectilesX = [], projectilesY = [], projectilesVelX = [], projectilesVelY = [], projectilesSize = [];
 let powerUpsX = [], powerUpsY = [];
 let round = 1, maxRounds = 5, enemyCount = 3;
+let active = false; // Controla si se está disparando o no
+let h, k, f, a; // Parámetros de la parábola 
 let gameState = 'start'; 
 let timer = 20; 
 let score = 0;
@@ -46,41 +48,6 @@ function setup() {
   catY = height - 150; // Ajusta la posición inicial del gato
   resetGame();
   backgroundMusic.loop(); // Reproducir música en bucle
-}
-
-function draw() {
-  background(backgroundImage);
-
-  if (gameState === 'start') {
-    displayStartMenu();
-  } else if (gameState === 'rules') {
-    displayRulesMenu();
-  } else if (gameState === 'lore') {
-    displayLoreMenu();
-  } else if (gameState === 'prepare') {
-    displayPreparationCountdown();
-  } else if (gameState === 'play') {
-    playGame();
-  } else if (gameState === 'win') {
-    displayWinMenu();
-  } else if (gameState === 'lose') {
-    displayLoseMenu();
-  }
-}
-
-function displayStartMenu() {
-  textAlign(CENTER);
-  textSize(48);
-  textFont(customFont); // Aplicar la fuente
-  fill(255, 204, 0);
-  text("Dientes y Colmillos - CAT GAME", width / 2, height / 2 - 100);
-  textSize(24);
-  text("By Joaquín Cortés and Valentina Robles", width / 2, height / 2 + 60);
-  fill(0);
-  text("Presiona Enter para empezar", width / 2, height / 2);
-  text("Presiona 'T (Mayus)' para leer las reglas", width / 2, height / 2 + 30);
-  text("Presiona 'L (Mayus)' para saber del lore", width / 2, height / 2 + 60);
-  textSize(18);
 }
 
 function displayLoreMenu() {
@@ -307,17 +274,74 @@ function activatePowerUp() {
     powerUpTimer = 300; // 5 segundos
   }
 }
-
 function shootProjectile(targetX, targetY) {
-  let angle = atan2(targetY - catY, targetX - mouseX);
-  let velX = cos(angle) * 5;
-  let velY = sin(angle) * 5;
-  
-  projectilesX.push(mouseX);
-  projectilesY.push(catY);
-  projectilesVelX.push(velX);
-  projectilesVelY.push(velY);
-  projectilesSize.push(10); // Tamaño del proyectil
+  if (!active) {
+    h = mouseX; // Raíz 1, punto de partida del proyectil
+    k = targetX; // Raíz 2, blanco al que se apunta
+    f = (catY + targetY) / 2; // Altura de las raíces (punto medio entre el gato y el objetivo)
+    
+    a = parabolic(catY, targetY, h, k, f); // Calculamos el coeficiente `a`
+
+    projectilesX.push(h);
+    projectilesY.push(catY);
+    projectilesVelX.push(0); // Velocidad inicial X
+    projectilesVelY.push(0); // Velocidad inicial Y
+    projectilesSize.push(10); // Tamaño del proyectil
+    
+    active = true; // Se inicia el disparo
+  }
+}
+
+function parabolic(y, f, h, k) {
+  // Cálculo del coeficiente `a` usando la fórmula proporcionada
+  return (y - f) / ((h - k) * (h - k));
+}
+
+function calculate(x) {
+  // Calcula el valor de la función cuadrática en `x`
+  return a * (x - h) * (x - k) + f;
+}
+
+function drawRef(targetX, targetY) {
+  // Dibuja el blanco actual
+  fill(255, 0, 0);
+  ellipse(targetX, targetY, 20, 20); // Blanco rojo de referencia
+}
+
+function updateProjectile() {
+  // Actualiza la posición del proyectil si está en movimiento
+  if (active && projectilesX.length > 0) {
+    for (let i = 0; i < projectilesX.length; i++) {
+      projectilesX[i] += 1; // Avanza en el eje X
+      projectilesY[i] = calculate(projectilesX[i]); // Calcula la posición Y basada en la parábola
+      
+      // Verifica si el proyectil aún está en pantalla
+      if (!onScreen(projectilesX[i], projectilesY[i])) {
+        active = false; // Detiene el disparo si sale de pantalla
+      }
+    }
+  }
+}
+
+function onScreen(px, py) {
+  // Verifica que el proyectil esté dentro de la pantalla
+  return px >= 0 && px <= width && py >= 0 && py <= height;
+}
+
+function draw() {
+  background(220);
+
+  // Dibuja el blanco en el objetivo
+  drawRef(mouseX, mouseY);
+
+  // Actualiza y dibuja el proyectil en movimiento
+  updateProjectile();
+
+  // Dibuja el proyectil
+  fill(0);
+  for (let i = 0; i < projectilesX.length; i++) {
+    ellipse(projectilesX[i], projectilesY[i], projectilesSize[i], projectilesSize[i]);
+  }
 }
 
 function manageCatMovement() {
@@ -439,18 +463,23 @@ function startGame(){
 
 function setup() {
   createCanvas(windowWidth, windowHeight);
-  // Boton para iniciar el juego
-  button = createButton("Empezar Juego!");
+  
+  // Botón para iniciar el juego
+  button = createButton("Empezar Juego");
   button.mouseClicked(startGame);
-  button.size(400,170);
-  button.position(150,580);
-  button.style("font-family", "Bodoni");
-  button.style("font-size", "48px");
+  button.size(170, 70);
+  button.position(580, 250);
+  button.style("font-family", "Rubik-Black");
+  button.style("font-size", "18px");
+  button.style("font-weight", "bold"); // Texto en negrita
+  button.style("background-color", "#FFA726"); // Fondo anaranjado amarillento
+  button.style("border-radius", "10px"); // Bordes redondeados
+  button.style("border", "2px solid black"); // Borde negro de 2px
+
   catY = height - 150; // Ajusta la posición inicial del gato
   resetGame();
   backgroundMusic.loop(); // Reproducir música en bucle
 }
-
 function draw() {
   background(backgroundImage);
 
@@ -479,7 +508,6 @@ function displayStartMenu() {
   text("Dientes y Colmillos - CAT GAME", width / 2, height / 2 - 100);
   textSize(24);
   fill(0);
-  text("Presiona Enter para empezar", width / 2, height / 2);
   text("Presiona 'T (Mayus)' para leer las reglas", width / 2, height / 2 + 50);
   text("Presiona 'L (Mayus)' para saber del lore", width / 2, height / 2 + 80);
   textSize(18);
@@ -562,14 +590,6 @@ function startBossRound() {
   bossX = width - 300;
   bossY = height - 400;
   bossSize = 250; // Tamaño considerable para el jefe
-
-  // Crear enemigos normales detrás del jefe
-  for (let i = 0; i < 3; i++) {
-    enemiesX.push(bossX - 100); // Posición fija a la izquierda del jefe
-    enemiesY.push(random(height - 200)); // Posición vertical aleatoria
-    enemiesDir.push(random([-1, 1])); // Dirección aleatoria
-  }
-
   gameState = 'play';
 }
 
